@@ -1,0 +1,70 @@
+<template>
+    <lightning-card title="AI Opportunity Insights" icon-name="utility:einstein">
+        <div slot="actions">
+            <lightning-button label="Refresh" onclick={handleRefresh} class="slds-m-right_x-small"></lightning-button>
+            <lightning-button label="Apply selected" variant="brand" onclick={handleApply} disabled={applyDisabled}></lightning-button>
+        </div>
+
+        <div class="slds-p-horizontal_medium">
+            <template lwc:if={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+            <template lwc:if={error}>
+                <p class="slds-text-color_error">{error}</p>
+            </template>
+            <p class="slds-text-color_error slds-m-bottom_x-small">{limitMessage}</p>
+
+            <template lwc:if={hasRows}>
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Opportunity</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Forecasted Users</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={rows} for:item="row">
+                            <tr key={row.opportunityId}>
+                                <td>
+                                    <lightning-input type="checkbox" variant="label-hidden" label="Select"
+                                        data-id={row.opportunityId} checked={row.selected} onchange={handleSelect}></lightning-input>
+                                </td>
+                                <td>
+                                    <div class="slds-text-title_bold">{row.opportunityName}</div>
+                                    <div class="slds-text-body_small">{row.accountName}</div>
+                                </td>
+                                <td>
+                                    <template lwc:if={row.typeEditable}>
+                                        <lightning-input variant="label-hidden" label="Type" value={row.draftType}
+                                            data-id={row.opportunityId} data-field="draftType" onchange={handleDraftChange}></lightning-input>
+                                        <span class={row.confidenceClass} title={row.typeReason}>{row.typeConfidence}</span>
+                                    </template>
+                                </td>
+                                <td>
+                                    <template lwc:if={row.descriptionEditable}>
+                                        <lightning-textarea variant="label-hidden" label="Description" value={row.draftDescription}
+                                            data-id={row.opportunityId} data-field="draftDescription" onchange={handleDraftChange}></lightning-textarea>
+                                    </template>
+                                </td>
+                                <td>
+                                    <template lwc:if={row.usersEditable}>
+                                        <lightning-input type="number" variant="label-hidden" label="Users" value={row.draftUsers}
+                                            data-id={row.opportunityId} data-field="draftUsers" onchange={handleDraftChange}></lightning-input>
+                                    </template>
+                                </td>
+                                <td>
+                                    <lightning-button-icon icon-name="utility:close" alternative-text="Reject"
+                                        data-id={row.opportunityId} onclick={handleReject}></lightning-button-icon>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+        </div>
+    </lightning-card>
+</template>
